@@ -92,11 +92,9 @@ class TasksDistribution
                 else {
                     $this->result[$i] += [$j => $this->tasks[$this->equel_or_less($this->times, $T - $t[$i])]];
                     $t[$i] += $this->times[$this->equel_or_less($this->times, $T - $t[$i])];
-                    //dd($t[$i]);
                     unset($this->tasks[$j]);
                     unset($this->times[$j]);
                 }
-
             }
             $b = true;
             ksort($this->result[$i]);
@@ -105,16 +103,13 @@ class TasksDistribution
         for ($i = 0; $i < $m; $i++)
         {
             $j = array_search(min($this->times),$this->times);
-            //dd($j);
             $number_instans = array_search(min($t),$t);
             $this->result[$number_instans] += [$j => $this->tasks[$j]];
             $t[$number_instans] += $this->times[$j];
             unset($this->tasks[$j]);
             unset($this->times[$j]);
-            ksort($this->result[$i]);
+            ksort($this->result[$number_instans]);
         }
-
-
     }
 
     private function equel_or_less($a,$n)
