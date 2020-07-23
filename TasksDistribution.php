@@ -24,6 +24,16 @@ class TasksDistribution
      */
     protected $max_time;
 
+    protected $time_sum;
+
+    /**
+     * @return float|int
+     */
+    public function getTimeSum()
+    {
+        return $this->time_sum;
+    }
+
     protected $tasks_n_times;
     /**
      * TasksDistribution constructor.
@@ -41,6 +51,7 @@ class TasksDistribution
         $this->tasks_n_times = [];
         for ($i=0; $i<sizeof($tasks); $i++)
             $this->tasks_n_times += [$this->tasks[$i] => $this->times[$i]];
+        $this->time_sum = array_sum($this->times);
     }
 
     protected $result;
@@ -53,69 +64,51 @@ class TasksDistribution
         return $this->result;
     }
 
+    protected $time;
 
+    /**
+     * @return mixed
+     */
+    public function getTime()
+    {
+        return $this->time;
+    }
 
     public function distribute()
     {   $n = sizeof($this->instants);
         $T = ceil(array_sum($this->times)/$n);
-
+        $this->time = $T;
+        $b = true;
         $a = array();
         $t = array_fill(0,sizeof($this->instants),0);
         //dd($T);
         $this->result = array_fill(0,$n,[]);
         for ($i = 0; $i < sizeof($this->instants); $i++)
         {
-            while ($t[$i] < $T && sizeof($this->times)>0)
+            while ($t[$i] < $T && sizeof($this->times)>0 && $b)
             {
                 $j = $this->equel_or_less($this->times, $T - $t[$i]);
-                $this->result[$i] += [$j =>  $this->tasks[$this->equel_or_less($this->times, $T - $t[$i])]     ];
-                $t[$i] += $this->times[$this->equel_or_less($this->times, $T - $t[$i])];
-                //dd($t[$i]);
-                unset($this->tasks[$j]);
-                unset($this->times[$j]);
-
+                if ($j === -1)
+                    $b = false;
+                else {
+                    $this->result[$i] += [$j => $this->tasks[$this->equel_or_less($this->times, $T - $t[$i])]];
+                    $t[$i] += $this->times[$this->equel_or_less($this->times, $T - $t[$i])];
+                    //dd($t[$i]);
+                    unset($this->tasks[$j]);
+                    unset($this->times[$j]);
+                }
 
             }
+            $b = true;
             ksort($this->result[$i]);
         }
 
+
     }
-
-
-    public function distribute_by_order()
-    {
-
-        $n = sizeof($this->instants);
-        $this->result = array_fill(0,$n,'');
-        for ($i = 0; $i < sizeof($this->tasks); $i++)
-        {
-            $this->result[$i%$n] = $this->result[$i%$n]  . $this->tasks[$i] . ';';
-        }
-    }
-
-    public function distribute_by()
-    {
-        $a = array();
-        $t = array_fill(0,sizeof($this->instants),0);
-        $n = sizeof($this->instants);
-        $this->result = array_fill(0,$n,'');
-        for ($i = 0; $i < sizeof($this->tasks); $i++)
-        {
-            if ($this->times[$i%$n] + $t[$i%$n] <= $this->max_time) {
-                $this->result[$i % $n] = $this->result[$i % $n] . $this->tasks[$i] . ';';
-                $t[$i%$n] += $this->times[$i];
-            }
-            else array_push($a,$this->tasks[$i]);
-        }
-        //dd($this->equel_or_less($this->times,6));
-        for ($i = 0; $i < sizeof($a); $i++)
-            $this->result[$i % $n] = $this->result[$i % $n] . $a[$i] . ';';
-    }
-
 
     private function equel_or_less($a,$n)
     {
-        $result = 0;
+        $result = -1;
         $val = min($a);
         foreach ($a as $key => $value) {
             if ($value <= $n && $val < $value) {
@@ -123,12 +116,23 @@ class TasksDistribution
                 $result = $key;
             }
         }
-        if ($val == min($a))
+        /*if ($val == min($a))
             foreach ($a as $key => $value)
                 if ($value == $val)
-                    $result = $key;
+                    $result = $key;*/
 
         return $result;
+    }
+
+    public function sum_result()
+    {
+        $sum = array_fill(0,sizeof($this->instants),0);
+        for ($i = 0; $i < sizeof($this->instants); $i++)
+        {
+            foreach ($this->result[$i] as $key=>$value)
+                $sum[$i] += $this->tasks_n_times[$value];
+        }
+        return $sum;
     }
 
 
