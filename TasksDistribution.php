@@ -77,9 +77,8 @@ class TasksDistribution
     public function distribute()
     {   $n = sizeof($this->instants);
         $T = ceil(array_sum($this->times)/$n);
-        $this->time = $T;
+        $this->time = array_sum($this->times)/$n;
         $b = true;
-        $a = array();
         $t = array_fill(0,sizeof($this->instants),0);
         //dd($T);
         $this->result = array_fill(0,$n,[]);
@@ -100,6 +99,18 @@ class TasksDistribution
 
             }
             $b = true;
+            ksort($this->result[$i]);
+        }
+        $m = sizeof($this->times);
+        for ($i = 0; $i < $m; $i++)
+        {
+            $j = array_search(min($this->times),$this->times);
+            //dd($j);
+            $number_instans = array_search(min($t),$t);
+            $this->result[$number_instans] += [$j => $this->tasks[$j]];
+            $t[$number_instans] += $this->times[$j];
+            unset($this->tasks[$j]);
+            unset($this->times[$j]);
             ksort($this->result[$i]);
         }
 
