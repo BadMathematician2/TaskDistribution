@@ -93,6 +93,7 @@ class TasksDistribution
     {
         return $this->time;
     }
+
     public function distribute()
     {
         $T = ceil($this->time);
@@ -116,8 +117,8 @@ class TasksDistribution
             $b = true;
             ksort($this->result[$i]);
         }
-        $m = sizeof($this->times);
-        for ($i = 0; $i < $m; $i++)  //запис тих завдань, що залишилися до тих виконавців,так, щоб завдання із найбільшим часом було у завдання із найманшим часом
+        $n = sizeof($this->times);
+        for ($i = 0; $i < $n; $i++)  //запис тих завдань, що залишилися до тих виконавців,так, щоб завдання із найбільшим часом було у завдання із найманшим часом
         {
             $j = array_search(max($this->times),$this->times);  //номер завдання із найбфльшим часом
             $number_instans = array_search(min($t),$t); //номер виконавця із найменшим сумарним часом
@@ -129,6 +130,12 @@ class TasksDistribution
         }
     }
 
+    /**
+     * @param array $a
+     * @param int $n
+     * @return int
+     * знаходження номера найбільшого елемента масива, який не перевищує n
+     */
     private function getNearestNumber($a, $n)
     {
         $result = -1;
@@ -143,7 +150,7 @@ class TasksDistribution
         return $result;
     }
 
-    public function sumResult()
+    public function sumResult() //сума часу кожного виконавця
     {
         $sum = array_fill(0,sizeof($this->instants),0);
         for ($i = 0; $i < sizeof($this->instants); $i++)
@@ -155,13 +162,6 @@ class TasksDistribution
         return $sum;
     }
 
-    private function writeResult($j,$T,$t)
-    {
-        $this->result[$i] += [$j => $this->tasks[$this->getNearestNumber($this->times, $T - $t[$i])]];
-        $t[$i] += $this->times[$this->getNearestNumber($this->times, $T - $t[$i])];
-        unset($this->tasks[$j]);
-        unset($this->times[$j]);
-    }
 
 
 
