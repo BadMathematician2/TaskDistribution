@@ -80,7 +80,6 @@ class TasksDistribution
         $this->time = array_sum($this->times)/$n;
         $b = true;
         $t = array_fill(0,sizeof($this->instants),0);
-        //dd($T);
         $this->result = array_fill(0,$n,[]);
         for ($i = 0; $i < sizeof($this->instants); $i++)
         {
@@ -122,10 +121,6 @@ class TasksDistribution
                 $result = $key;
             }
         }
-        /*if ($val == min($a))
-            foreach ($a as $key => $value)
-                if ($value == $val)
-                    $result = $key;*/
 
         return $result;
     }
